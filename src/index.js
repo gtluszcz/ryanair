@@ -1,22 +1,15 @@
 import Phaser from 'phaser'
 
-import Menu from './states/Menu'
-import Boot from './states/Boot'
-import Preload from './states/Preload'
+import Game from './scenes/Game.js'
 
-window.game = new Phaser.Game({
+
+var config = {
     type: Phaser.AUTO,
-    width: window.innerWidth * window.devicePixelRatio,
-    height: window.innerHeight * window.devicePixelRatio,
-})
+    width: window.innerWidth,
+    height: window.innerHeight,
+    backgroundColor: '#000000',
+    parent: 'phaser-example',
+    scene: [ Game ]
+};
 
-console.log(window.game.state)
-
-window.game.Scene.add('Menu', Menu)
-window.game.Scene.add('Boot', Boot)
-window.game.Scene.add('Preload', Preload)
-// window.game.state.add('GameTitle', GameTitle)
-// window.game.state.add('Main', Main)
-// window.game.state.add('GameOver', GameOver)
-
-window.game.state.start('Boot')
+var game = new Phaser.Game(config);
