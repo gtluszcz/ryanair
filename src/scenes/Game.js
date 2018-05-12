@@ -15,7 +15,17 @@ export default class Game extends Phaser.Scene {
         //load cloud images
         for (let i=1;i<=9;i++){
             this.load.image('cloud'+i, '/assets/clouds/cloud'+i+'.png');
+            
         }
+
+        
+        
+
+
+        //animation
+
+        this.load.spritesheet('suitcase', '../assets/animation/poziomo.png', { frameWidth: 595, frameHeight: 842, endFrame: 842 });
+
 
     }
 
@@ -26,6 +36,12 @@ export default class Game extends Phaser.Scene {
 
     create ()
     {
+
+
+        //plane
+        this.physicsPlane = this.physics.add.image(400, window.innerHeight / 2, 'plane');
+        
+       
         this.setup()
 
         //clouds
@@ -34,21 +50,29 @@ export default class Game extends Phaser.Scene {
         for (let i=1;i<=27;i++){
             let y = (i%9)+1
             console.log(y)
-            let cl = this.clouds.create(100*y,100*y,'cloud'+y)
+            let cl = this.physics.add.image(100*y,100*y,'cloud'+y)
             this.clouds.add(cl)
             this.clouds.killAndHide(cl)
         }
 
-        //plane
-        var configPlane = {
-            key: 'plane',
-            x: 400,
-            y: window.innerHeight / 2
-        };
-        this.plane = this.make.sprite(configPlane)
 
+        this.physics.add.collider(this.physicsPlane, this.clouds);
+        
 
+        //animation
+//         var animConfig = {
+//             key: 'open',
+//             frames: this.anims.generateFrameNumbers('suitcase', { start: 0, end: 7, first: 7 }),
+//             frameRate: 12
+//         };
+
+//         this.anims.create(animConfig);
+
+//         var suitcase= this.add.sprite(400, 500, 'suitcase');
+//         suitcase.anims.play('open').setScale(0.3);
     }
+
+
     update(time,delta){
         this.respawnClouds()
         this.removeCloudsWhenOffScreen()
@@ -78,6 +102,7 @@ export default class Game extends Phaser.Scene {
                 this.clouds.killAndHide(el)
             }
         })
+
     }
 
 

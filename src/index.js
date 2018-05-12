@@ -9,6 +9,12 @@ var config = {
     height: window.innerHeight,
     backgroundColor: '#000000',
     parent: 'phaser-example',
+    physics: {
+        default: 'arcade',
+        arcade: {
+            debug: false
+        }
+    },
     scene: [ Game ]
 };
 
