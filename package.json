@@ -20,7 +20,12 @@
   },
   "homepage": "https://github.com/gtluszcz/ryanair#readme",
   "devDependencies": {
+    "browser-sync": "^2.24.4",
+    "browser-sync-webpack-plugin": "^2.0.1",
     "cross-env": "^5.1.5",
     "laravel-mix": "^2.1.11"
+  },
+  "dependencies": {
+    "phaser": "^3.7.1"
   }
 }
