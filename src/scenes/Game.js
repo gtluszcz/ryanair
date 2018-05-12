@@ -3,15 +3,15 @@ import Phaser from 'phaser'
 export default class Game extends Phaser.Scene {
 
 
-    constructor ()
-    {
+    constructor (){
         super({ key: 'Game' })
     }
 
-    preload ()
-    {
+    preload (){
         //load plane image
         this.load.image('plane', '/assets/planeBlue1.png');
+        //load coin image
+        this.load.image('coin', '/assets/coinPlaceholder.png');
         //load cloud images
         for (let i=1;i<=9;i++){
             this.load.image('cloud'+i, '/assets/clouds/cloud'+i+'.png');
@@ -32,32 +32,46 @@ export default class Game extends Phaser.Scene {
     setup(){
         this.CLOUD_SPAWN_TIME = 500
         this.CLOUD_SPEED = 5
+        this.COIN_SPAWN_TIME = 5000
+
     }
 
-    create ()
-    {
-
-
+    create (){
         //plane
         this.physicsPlane = this.physics.add.image(400, window.innerHeight / 2, 'plane');
-        
-       
+    
+        //setup macros
         this.setup()
 
-        //clouds
-        this.lastTimeSpawnedCloud = 0
+        //setup variables useful for clouds and coins
+
+        this.lastTimeSpawnedCloud = 0;
+        this.lastTimeSpawnedCoin = 0;
         this.clouds = this.add.group();
+        this.coins = this.add.group();
+        this.score=0;
+
+        //coin overlapping
+
+        this.physics.add.overlap(this.physicsPlane, this.coins, (A,B) =>{
+            this.coins.remove(B);
+            B.destroy()
+            this.score++;
+            console.log(this.score);            
+        });
+    
+
+        //cloud setup
         for (let i=1;i<=27;i++){
             let y = (i%9)+1
-            console.log(y)
             let cl = this.physics.add.image(100*y,100*y,'cloud'+y)
             this.clouds.add(cl)
             this.clouds.killAndHide(cl)
         }
+    }
 
-
-        this.physics.add.collider(this.physicsPlane, this.clouds);
         
+
 
         //animation
 //         var animConfig = {
@@ -70,15 +84,20 @@ export default class Game extends Phaser.Scene {
 
 //         var suitcase= this.add.sprite(400, 500, 'suitcase');
 //         suitcase.anims.play('open').setScale(0.3);
-    }
+    
 
 
     update(time,delta){
         this.respawnClouds()
         this.removeCloudsWhenOffScreen()
+        this.respawnCoins();
+        this.removeCoinsWhenOffScreen();
 
-        console.log(delta/(1000/60))
-        // Move Clouds
+        if (this.planeOverlaps){
+            this.physicsPlane.setVelocityX(-this.COLISION_SPEED)
+        }else{
+            this.physicsPlane.setVelocityX(0)
+        }
         this.clouds.getChildren().forEach(el => el.x-=this.CLOUD_SPEED*(delta/(1000/60)))
     }
 
@@ -102,9 +121,34 @@ export default class Game extends Phaser.Scene {
                 this.clouds.killAndHide(el)
             }
         })
-
     }
 
+    respawnCoins(){
+        if (this.time.now - this.lastTimeSpawnedCoin > this.COIN_SPAWN_TIME){
+            this.lastTimeSpawnedCoin = this.time.now
+            let x = window.innerWidth
+            let y = Math.random()*window.innerHeight
+            let coin = this.physics.add.image(x, y, 'coin')
+            if (coin!==null){
+                this.coins.add(coin)
+                coin.setVelocityX(-250)
+                coin.setScale(0.2)
+                coin.x +=coin.frame.width / 2
+                coin.setCircle(coin.frame.width/2)
 
+                
+            }
+            
+        }
+    }
+
+    removeCoinsWhenOffScreen(){
+        this.coins.getChildren().forEach(el => {
+            if (el.x + el.frame.width < 0){
+                this.coins.remove(el)
+                el.destroy()
+            }
+        })
+    }
 }
 

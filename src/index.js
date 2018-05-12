@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 
 import Game from './scenes/Game.js'
+import Menu from './scenes/Menu.js'
 
 
 var config = {
@@ -12,7 +13,7 @@ var config = {
     physics: {
         default: 'arcade',
         arcade: {
-            debug: false
+            debug: true
         }
     },
     scene: [ Game ]
