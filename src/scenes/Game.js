@@ -12,18 +12,15 @@ export default class Game extends Phaser.Scene {
     {
         //load plane image
         this.load.image('plane', '/assets/plane-rayanair.png');
+
         //load cloud images
         for (let i=1;i<=9;i++){
             this.load.image('cloud'+i, '/assets/clouds/cloud'+i+'.png');
             
         }
 
-        
-        
-
-
         //animation
-        this.load.spritesheet('suitcase', '../assets/animation/poziomo.png', { frameWidth: 595, frameHeight: 842, endFrame: 842 });
+        //this.load.spritesheet('suitcase', '../assets/animation/poziomo.png', { frameWidth: 595, frameHeight: 842, endFrame: 842 });
 
 
     }
@@ -56,8 +53,8 @@ export default class Game extends Phaser.Scene {
             this.clouds.killAndHide(cl)
         }
 
-        //console.log(this.physicsPlane.updateBounds())
 
+        //Plane overlaps clouds
         this.physics.add.overlap(this.physicsPlane, this.clouds, (el) => {
             clearTimeout(this.timeout)
             this.planeOverlaps = true
@@ -86,17 +83,20 @@ export default class Game extends Phaser.Scene {
     update(time,delta){
         this.respawnClouds()
         this.removeCloudsWhenOffScreen()
+        this.handleCloudsOverlapingByPlane()
 
+        if (this.input.activePointer.isDown) {
+            console.log(this.input.activePointer.y)
+        }
 
+    }
+
+    handleCloudsOverlapingByPlane(){
         if (this.planeOverlaps){
             this.physicsPlane.setVelocityX(-this.COLISION_SPEED)
         }else{
             this.physicsPlane.setVelocityX(0)
         }
-
-
-
-
     }
 
     respawnClouds(){
@@ -111,6 +111,9 @@ export default class Game extends Phaser.Scene {
                 cl.setVisible(true)
                 cl.setVelocityX(-((Math.random()*200)+200))
                 cl.setScale((Math.random()*1.7)+0.7)
+                cl.setSize(cl.frame.width/1.3, cl.frame.height/ 1.3)
+                cl.setOffset((cl.frame.width - cl.frame.width/1.3) /2 ,(cl.frame.height - cl.frame.height/ 1.3)/2)
+
             }
         }
     }
