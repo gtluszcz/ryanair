@@ -1,7 +1,7 @@
 import Phaser from 'phaser'
 
 import Game from './scenes/Game.js'
-import Menu from './scenes/Menu.js'
+import Animations from './scenes/ChestAnim.js'
 
 
 var config = {
@@ -16,7 +16,7 @@ var config = {
             debug: true
         }
     },
-    scene: [ Game ]
+    scene: [ Animations ]
 };
 
 var game = new Phaser.Game(config);
