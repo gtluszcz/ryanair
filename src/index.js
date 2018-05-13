@@ -12,8 +12,8 @@ var config = {
     parent: 'phaser-example',
     physics: {
         default: 'arcade',
-        arcade: {
-            debug: true
+        arcade: {          
+            debug: true,
         }
     },
     scene: [ Animations ]
