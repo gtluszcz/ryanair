@@ -45,7 +45,7 @@ export default class Game extends Phaser.Scene {
         this.physicsPlane = this.physics.add.sprite(400, window.innerHeight / 2, 'plane');
         this.physicsPlane.setScale(0.3)
         console.log(this.physicsPlane)
-        this.physicsPlane.body.setCircle(250)
+        this.physicsPlane.body.setCircle(220)
         this.physicsPlane.body.setOffset(90,-40)
         console.log(this.physicsPlane.body)
 
@@ -61,7 +61,7 @@ export default class Game extends Phaser.Scene {
 
         //coin overlapping
 
-        this.matter.add.overlap(this.physicsPlane, this.coins, (A,B) =>{
+        this.physics.add.overlap(this.physicsPlane, this.coins, (A,B) =>{
             this.coins.remove(B);
             B.destroy()
             this.score++;
@@ -73,7 +73,7 @@ export default class Game extends Phaser.Scene {
         for (let i=1;i<=27;i++){
             let y = (i%9)+1
 
-            let cl = this.matter.add.image(100*y,100*y,'cloud'+y)
+            let cl = this.physics.add.image(3000,100*y,'cloud'+y)
             this.clouds.add(cl)
             this.clouds.killAndHide(cl)
         }
@@ -172,15 +172,16 @@ export default class Game extends Phaser.Scene {
             this.lastTimeSpawnedCoin = this.time.now
             let x = window.innerWidth
             let y = Math.random()*window.innerHeight
-            let coin = this.matter.add.sprite(x, y, 'coinSpriteSheet')
+            let coin = this.physics.add.sprite(x, y, 'coinSpriteSheet')
             coin.anims.play('coinAnim');
             if (coin!==null){
                 this.coins.add(coin)
                 coin.setVelocityX(-250)
                 
                 coin.x +=coin.frame.width / 2
-                coin.setCircle(coin.frame.width/2)
+                coin.setCircle(coin.frame.width/2,-10,-6)
                 coin.setScale(0.5)
+
 
                 
             }
