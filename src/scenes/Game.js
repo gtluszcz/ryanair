@@ -35,10 +35,11 @@ export default class Game extends Phaser.Scene {
 
 
         //plane
-        this.physicsPlane = this.physics.add.image(400, window.innerHeight / 2, 'plane');
+        this.physicsPlane = this.physics.add.sprite(400, window.innerHeight / 2, 'plane');
         this.physicsPlane.setScale(0.3)
-        this.physicsPlane.body.setSize(700,95)
-        this.physicsPlane.body.setOffset(20,130)
+        console.log(this.physicsPlane)
+        this.physicsPlane.body.setCircle(250)
+        this.physicsPlane.body.setOffset(90,-40)
         console.log(this.physicsPlane.body)
         this.setup()
 
@@ -86,7 +87,14 @@ export default class Game extends Phaser.Scene {
         this.handleCloudsOverlapingByPlane()
 
         if (this.input.activePointer.isDown) {
-            console.log(this.input.activePointer.y)
+
+            let rad = Math.atan2(this.input.activePointer.y - this.physicsPlane.y, this.input.activePointer.x - this.physicsPlane.x)
+            this.physicsPlane.setRotation(rad)
+
+            this.physicsPlane.setVelocityY(400 * Math.sin(rad))
+
+
+
         }
 
     }
