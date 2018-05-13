@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 
 import Game from './scenes/Game.js'
+import Animations from './scenes/ChestAnim.js'
 
 
 var config = {
@@ -11,11 +12,11 @@ var config = {
     parent: 'phaser-example',
     physics: {
         default: 'arcade',
-        arcade: {
+        arcade: {          
             debug: true,
         }
     },
-    scene: [ Game ]
+    scene: [ Animations ]
 };
 
 var game = new Phaser.Game(config);

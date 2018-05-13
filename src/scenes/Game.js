@@ -3,15 +3,15 @@ import Phaser from 'phaser'
 export default class Game extends Phaser.Scene {
 
 
-    constructor ()
-    {
+    constructor (){
         super({ key: 'Game' })
     }
 
-    preload ()
-    {
+    preload (){
         //load plane image
         this.load.image('plane', '/assets/plane-rayanair.png');
+        //load coin image
+        this.load.image('coin', '/assets/coinPlaceholder.png');
 
         //load cloud images
         for (let i=1;i<=9;i++){
@@ -20,39 +20,64 @@ export default class Game extends Phaser.Scene {
         }
 
         //animation
-        //this.load.spritesheet('suitcase', '../assets/animation/poziomo.png', { frameWidth: 595, frameHeight: 842, endFrame: 842 });
+
+        this.load.spritesheet('suitcase', '../assets/animation/poziomo.png', { frameWidth: 595, frameHeight: 842, endFrame: 842 });
+        this.load.spritesheet('coinSpritesheet','../assets/animation/coin.png', {frameWidth:64, frameHeight: 64, endFrame: 64});
 
 
     }
 
     setup(){
-        this.CLOUD_SPAWN_TIME = 900
+        this.CLOUD_SPAWN_TIME = 500
+        this.COIN_SPAWN_TIME = 5000
+
         this.COLISION_SPEED = 80
     }
 
     create ()
     {
 
+    }
 
+    create (){
         //plane
+
         this.physicsPlane = this.physics.add.sprite(400, window.innerHeight / 2, 'plane');
         this.physicsPlane.setScale(0.3)
         console.log(this.physicsPlane)
         this.physicsPlane.body.setCircle(250)
         this.physicsPlane.body.setOffset(90,-40)
         console.log(this.physicsPlane.body)
+
         this.setup()
 
-        //clouds
-        this.lastTimeSpawnedCloud = 0
+        //setup variables useful for clouds and coins
+
+        this.lastTimeSpawnedCloud = 0;
+        this.lastTimeSpawnedCoin = 0;
         this.clouds = this.add.group();
+        this.coins = this.add.group();
+        this.score=0;
+
+        //coin overlapping
+
+        this.matter.add.overlap(this.physicsPlane, this.coins, (A,B) =>{
+            this.coins.remove(B);
+            B.destroy()
+            this.score++;
+            console.log(this.score);            
+        });
+    
+
+        //cloud setup
         for (let i=1;i<=27;i++){
             let y = (i%9)+1
-            console.log(y)
-            let cl = this.physics.add.image(3000,100*y,'cloud'+y)
+
+            let cl = this.matter.add.image(100*y,100*y,'cloud'+y)
             this.clouds.add(cl)
             this.clouds.killAndHide(cl)
         }
+    
 
 
         //Plane overlaps clouds
@@ -63,19 +88,21 @@ export default class Game extends Phaser.Scene {
                 this.planeOverlaps = false
             }, 50)
         });
+
         
 
+
         //animation
-//         var animConfig = {
-//             key: 'open',
-//             frames: this.anims.generateFrameNumbers('suitcase', { start: 0, end: 7, first: 7 }),
-//             frameRate: 12
-//         };
 
-//         this.anims.create(animConfig);
 
-//         var suitcase= this.add.sprite(400, 500, 'suitcase');
-//         suitcase.anims.play('open').setScale(0.3);
+        var coinAnimConfig = {
+            key: 'coinAnim',
+            frames: this.anims.generateFrameNumbers('coinSpritesheet', {start:0, end:8, first: 8}),
+            frameRate: 12,
+            repeat: -1
+        };
+
+        this.anims.create(coinAnimConfig);
     }
 
 
@@ -84,6 +111,10 @@ export default class Game extends Phaser.Scene {
     update(time,delta){
         this.respawnClouds()
         this.removeCloudsWhenOffScreen()
+
+        this.respawnCoins();
+        this.removeCoinsWhenOffScreen();
+
         this.handleCloudsOverlapingByPlane()
 
         if (this.input.activePointer.isDown) {
@@ -100,11 +131,13 @@ export default class Game extends Phaser.Scene {
     }
 
     handleCloudsOverlapingByPlane(){
+
         if (this.planeOverlaps){
             this.physicsPlane.setVelocityX(-this.COLISION_SPEED)
         }else{
             this.physicsPlane.setVelocityX(0)
         }
+
     }
 
     respawnClouds(){
@@ -132,9 +165,37 @@ export default class Game extends Phaser.Scene {
                 this.clouds.killAndHide(el)
             }
         })
-
     }
 
+    respawnCoins(){
+        if (this.time.now - this.lastTimeSpawnedCoin > this.COIN_SPAWN_TIME){
+            this.lastTimeSpawnedCoin = this.time.now
+            let x = window.innerWidth
+            let y = Math.random()*window.innerHeight
+            let coin = this.matter.add.sprite(x, y, 'coinSpriteSheet')
+            coin.anims.play('coinAnim');
+            if (coin!==null){
+                this.coins.add(coin)
+                coin.setVelocityX(-250)
+                
+                coin.x +=coin.frame.width / 2
+                coin.setCircle(coin.frame.width/2)
+                coin.setScale(0.5)
+
+                
+            }
+            
+        }
+    }
+
+    removeCoinsWhenOffScreen(){
+        this.coins.getChildren().forEach(el => {
+            if (el.x + el.frame.width < 0){
+                this.coins.remove(el)
+                el.destroy()
+            }
+        })
+    }
 
 
 
