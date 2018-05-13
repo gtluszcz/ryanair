@@ -25,7 +25,7 @@ export default class Game extends Phaser.Scene {
         //animation
 
         this.load.spritesheet('suitcase', '../assets/animation/poziomo.png', { frameWidth: 595, frameHeight: 842, endFrame: 842 });
-
+        this.load.spritesheet('coinSpritesheet','../assets/animation/coin.png', {frameWidth:64, frameHeight: 64, endFrame: 64});
 
     }
 
@@ -68,23 +68,35 @@ export default class Game extends Phaser.Scene {
             this.clouds.add(cl)
             this.clouds.killAndHide(cl)
         }
-    }
+    
 
         
 
 
         //animation
-//         var animConfig = {
-//             key: 'open',
-//             frames: this.anims.generateFrameNumbers('suitcase', { start: 0, end: 7, first: 7 }),
-//             frameRate: 12
-//         };
 
-//         this.anims.create(animConfig);
+        // var animConfig = {
+        //     key: 'open',
+        //     frames: this.anims.generateFrameNumbers('suitcase', { start: 0, end: 7, first: 7 }),
+        //     frameRate: 12
+        // };
 
-//         var suitcase= this.add.sprite(400, 500, 'suitcase');
-//         suitcase.anims.play('open').setScale(0.3);
-    
+         
+
+        // var suitcase= this.add.sprite(400, 500, 'suitcase');
+        // suitcase.anims.play('open').setScale(0.3);
+
+        //var coinAnim = this.add.sprite(400,500,'coinSpritesheet');
+
+        var coinAnimConfig = {
+            key: 'coinAnim',
+            frames: this.anims.generateFrameNumbers('coinSpritesheet', {start:0, end:8, first: 8}),
+            frameRate: 12,
+            repeat: -1
+        };
+
+        this.anims.create(coinAnimConfig);
+    }
 
 
     update(time,delta){
@@ -128,13 +140,15 @@ export default class Game extends Phaser.Scene {
             this.lastTimeSpawnedCoin = this.time.now
             let x = window.innerWidth
             let y = Math.random()*window.innerHeight
-            let coin = this.physics.add.image(x, y, 'coin')
+            let coin = this.physics.add.sprite(x, y, 'coinSpriteSheet')
+            coin.anims.play('coinAnim');
             if (coin!==null){
                 this.coins.add(coin)
                 coin.setVelocityX(-250)
-                coin.setScale(0.2)
+                
                 coin.x +=coin.frame.width / 2
                 coin.setCircle(coin.frame.width/2)
+                coin.setScale(0.5)
 
                 
             }
