@@ -75,18 +75,6 @@ export default class Game extends Phaser.Scene {
 
         //animation
 
-        // var animConfig = {
-        //     key: 'open',
-        //     frames: this.anims.generateFrameNumbers('suitcase', { start: 0, end: 7, first: 7 }),
-        //     frameRate: 12
-        // };
-
-         
-
-        // var suitcase= this.add.sprite(400, 500, 'suitcase');
-        // suitcase.anims.play('open').setScale(0.3);
-
-        //var coinAnim = this.add.sprite(400,500,'coinSpritesheet');
 
         var coinAnimConfig = {
             key: 'coinAnim',
