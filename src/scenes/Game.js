@@ -11,27 +11,23 @@ export default class Game extends Phaser.Scene {
     preload ()
     {
         //load plane image
-        this.load.image('plane', '/assets/planeBlue1.png');
+        this.load.image('plane', '/assets/plane-rayanair.png');
+
         //load cloud images
         for (let i=1;i<=9;i++){
             this.load.image('cloud'+i, '/assets/clouds/cloud'+i+'.png');
             
         }
 
-        
-        
-
-
         //animation
-
-        this.load.spritesheet('suitcase', '../assets/animation/poziomo.png', { frameWidth: 595, frameHeight: 842, endFrame: 842 });
+        //this.load.spritesheet('suitcase', '../assets/animation/poziomo.png', { frameWidth: 595, frameHeight: 842, endFrame: 842 });
 
 
     }
 
     setup(){
-        this.CLOUD_SPAWN_TIME = 500
-        this.CLOUD_SPEED = 5
+        this.CLOUD_SPAWN_TIME = 900
+        this.COLISION_SPEED = 80
     }
 
     create ()
@@ -39,9 +35,12 @@ export default class Game extends Phaser.Scene {
 
 
         //plane
-        this.physicsPlane = this.physics.add.image(400, window.innerHeight / 2, 'plane');
-        
-       
+        this.physicsPlane = this.physics.add.sprite(400, window.innerHeight / 2, 'plane');
+        this.physicsPlane.setScale(0.3)
+        console.log(this.physicsPlane)
+        this.physicsPlane.body.setCircle(250)
+        this.physicsPlane.body.setOffset(90,-40)
+        console.log(this.physicsPlane.body)
         this.setup()
 
         //clouds
@@ -50,13 +49,20 @@ export default class Game extends Phaser.Scene {
         for (let i=1;i<=27;i++){
             let y = (i%9)+1
             console.log(y)
-            let cl = this.physics.add.image(100*y,100*y,'cloud'+y)
+            let cl = this.physics.add.image(3000,100*y,'cloud'+y)
             this.clouds.add(cl)
             this.clouds.killAndHide(cl)
         }
 
 
-        this.physics.add.collider(this.physicsPlane, this.clouds);
+        //Plane overlaps clouds
+        this.physics.add.overlap(this.physicsPlane, this.clouds, (el) => {
+            clearTimeout(this.timeout)
+            this.planeOverlaps = true
+            this.timeout = setTimeout(() => {
+                this.planeOverlaps = false
+            }, 50)
+        });
         
 
         //animation
@@ -73,13 +79,32 @@ export default class Game extends Phaser.Scene {
     }
 
 
+
+
     update(time,delta){
         this.respawnClouds()
         this.removeCloudsWhenOffScreen()
+        this.handleCloudsOverlapingByPlane()
 
-        console.log(delta/(1000/60))
-        // Move Clouds
-        this.clouds.getChildren().forEach(el => el.x-=this.CLOUD_SPEED*(delta/(1000/60)))
+        if (this.input.activePointer.isDown) {
+
+            let rad = Math.atan2(this.input.activePointer.y - this.physicsPlane.y, this.input.activePointer.x - this.physicsPlane.x)
+            this.physicsPlane.setRotation(rad)
+
+            this.physicsPlane.setVelocityY(400 * Math.sin(rad))
+
+
+
+        }
+
+    }
+
+    handleCloudsOverlapingByPlane(){
+        if (this.planeOverlaps){
+            this.physicsPlane.setVelocityX(-this.COLISION_SPEED)
+        }else{
+            this.physicsPlane.setVelocityX(0)
+        }
     }
 
     respawnClouds(){
@@ -92,6 +117,11 @@ export default class Game extends Phaser.Scene {
                 cl.x += cl.frame.width / 2
                 cl.active=true
                 cl.setVisible(true)
+                cl.setVelocityX(-((Math.random()*200)+200))
+                cl.setScale((Math.random()*1.7)+0.7)
+                cl.setSize(cl.frame.width/1.3, cl.frame.height/ 1.3)
+                cl.setOffset((cl.frame.width - cl.frame.width/1.3) /2 ,(cl.frame.height - cl.frame.height/ 1.3)/2)
+
             }
         }
     }
@@ -104,6 +134,8 @@ export default class Game extends Phaser.Scene {
         })
 
     }
+
+
 
 
 }
